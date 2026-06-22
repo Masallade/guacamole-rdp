@@ -1,0 +1,71 @@
+# Guacamole + RDP remote desktop stack
+#
+# What runs here:
+#   postgres   - stores Guacamole users and connection settings
+#   guacd      - RDP proxy (acts as RDP client toward rdesktop)
+#   guacamole  - web UI your friend opens in a browser
+#   rdesktop   - Linux desktop + xrdp + Chrome (the actual "remote PC")
+#
+# First-time setup on Debian:
+#   cd docker && ./setup.sh
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: guac-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-guacamole_db}
+      POSTGRES_USER: ${POSTGRES_USER:-guacamole_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U guacamole_user -d guacamole_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  guacd:
+    image: guacamole/guacd
+    container_name: guac-guacd
+    restart: unless-stopped
+
+  guacamole:
+    image: guacamole/guacamole
+    container_name: guac-web
+    ports:
+      - "${GUACAMOLE_PORT:-8080}:8080"
+    environment:
+      GUACD_HOSTNAME: guacd
+      POSTGRES_HOSTNAME: postgres
+      POSTGRES_DATABASE: ${POSTGRES_DB:-guacamole_db}
+      POSTGRES_USER: ${POSTGRES_USER:-guacamole_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      guacd:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  rdesktop:
+    build:
+      context: .
+      dockerfile: Dockerfile.rdesktop
+    container_name: chrome-rdp
+    environment:
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+      TZ: ${TZ:-UTC}
+    volumes:
+      - rdesktop-data:/config
+    shm_size: "1gb"
+    security_opt:
+      - seccomp:unconfined
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  rdesktop-data:
