@@ -39,13 +39,14 @@ services:
       - "${GUACAMOLE_PORT:-8080}:8080"
     environment:
       GUACD_HOSTNAME: guacd
+      GUACAMOLE_HOME: /etc/guacamole
       WEBAPP_CONTEXT: dawood-machine
       POSTGRESQL_HOSTNAME: postgres
       POSTGRESQL_DATABASE: ${POSTGRES_DB:-guacamole_db}
       POSTGRESQL_USER: ${POSTGRES_USER:-guacamole_user}
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./branding/branding.jar:/opt/guacamole/extensions/branding.jar:ro
+      - ./guacamole-home:/etc/guacamole:ro
     depends_on:
       guacd:
         condition: service_started
