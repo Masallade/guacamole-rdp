@@ -1,0 +1,5 @@
+{
+    "guacamoleVersion": "*",
+    "name": "Custom Branding",
+    "namespace": "branding"
+}

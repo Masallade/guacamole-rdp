@@ -45,7 +45,7 @@ services:
       POSTGRESQL_USER: ${POSTGRES_USER:-guacamole_user}
       POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./branding:/opt/guacamole/branding:ro
+      - ./branding/branding.jar:/opt/guacamole/extensions/branding.jar:ro
     depends_on:
       guacd:
         condition: service_started
