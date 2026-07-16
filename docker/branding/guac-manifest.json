@@ -2,6 +2,9 @@
     "guacamoleVersion": "*",
     "name": "Custom Branding",
     "namespace": "branding",
+    "css": [
+        "css/login.css"
+    ],
     "translations": [
         "translations/en.json"
     ]
