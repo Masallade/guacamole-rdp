@@ -1,5 +1,8 @@
 {
     "guacamoleVersion": "*",
     "name": "Custom Branding",
-    "namespace": "branding"
+    "namespace": "branding",
+    "translations": [
+        "translations/en.json"
+    ]
 }

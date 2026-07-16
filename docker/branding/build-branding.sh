@@ -1,6 +1,5 @@
 #!/bin/bash
-# Creates branding.jar (a zip) from branding files
 cd "$(dirname "$0")"
 rm -f branding.jar
-zip -j branding.jar guac-manifest.json branding.json
+zip -r branding.jar guac-manifest.json translations/
 echo "branding.jar created"
